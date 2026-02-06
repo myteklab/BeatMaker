@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeatMaker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #6c5ce7;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(108, 92, 231, 0.5);
+        }
+
+        /* Transport Controls */
+        .transport {
+            background: rgba(30, 30, 50, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            border: 2px solid #6c5ce7;
+        }
+
+        .transport-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(108, 92, 231, 0.3);
+            box-shadow: 0 2px 8px rgba(108, 92, 231, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(108, 92, 231, 0.5);
+        }
+
+        .btn:hover {
+            background: #5f4fd1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.playing {
+            background: #00b894;
+        }
+
+        .btn.playing:hover {
+            background: #00a383;
+        }
+
+        .btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .bpm-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .bpm-control label {
+            font-weight: 600;
+            color: #6c5ce7;
+        }
+
+        .bpm-control input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, #6c5ce7 0%, #6c5ce7 50%, #444 50%, #444 100%);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .bpm-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #6c5ce7;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(108, 92, 231, 0.8);
+        }
+
+        .bpm-control input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #6c5ce7;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(108, 92, 231, 0.8);
+        }
+
+        .bpm-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #6c5ce7;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Sequencer Grid */
+        .sequencer {
+            background: rgba(30, 30, 50, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #6c5ce7;
+            overflow-y: hidden;
+        }
+
+        .grid-wrapper {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+
+        .grid-main {
+            flex: 0 0 auto;
+        }
+
+        .grid-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-row {
+            display: flex;
+            margin-bottom: 4px;
+        }
+
+        .controls-column {
+            flex: 0 0 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .grid-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .track-label {
+            min-width: 100px;
+            width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            font-weight: 600;
+            color: #6c5ce7;
+            padding-left: 10px;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .track-cells {
+            display: flex;
+            gap: 4px;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(108, 92, 231, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.1s;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .track-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 40px;
+            padding: 0 8px;
+            background: rgba(30, 30, 50, 0.4);
+            border-radius: 6px;
+            border: 1px solid rgba(108, 92, 231, 0.2);
+        }
+
+        .track-btn {
+            width: 26px;
+            height: 26px;
+            border: 2px solid rgba(108, 92, 231, 0.3);
+            background: rgba(30, 30, 50, 0.6);
+            color: rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 11px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .track-btn:hover {
+            border-color: #6c5ce7;
+            color: #e0e0e0;
+        }
+
+        .track-btn.active {
+            background: #6c5ce7;
+            border-color: #6c5ce7;
+            color: white;
+        }
+
+        .mute-btn.active {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .solo-btn.active {
+            background: #f39c12;
+            border-color: #f39c12;
+        }
+
+        .volume-slider {
+            flex: 1;
+            min-width: 50px;
+            height: 4px;
+            border-radius: 2px;
+            background: linear-gradient(to right, #6c5ce7 0%, #6c5ce7 100%, #444 100%, #444 100%);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #6c5ce7;
+            cursor: pointer;
+            box-shadow: 0 0 4px rgba(108, 92, 231, 0.6);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #6c5ce7;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 4px rgba(108, 92, 231, 0.6);
+        }
+
+        .cell:hover {
+            background: rgba(108, 92, 231, 0.2);
+            border-color: #6c5ce7;
+        }
+
+        .cell.active {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            border-color: #6c5ce7;
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.6);
+        }
+
+        .cell.current-step {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), inset 0 0 10px rgba(255, 215, 0, 0.3);
+            border-color: gold;
+        }
+
+        .cell.current-step.active {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 15px rgba(108, 92, 231, 0.6);
+        }
+
+        /* Step numbers */
+        .step-numbers {
+            display: flex;
+            margin-bottom: 10px;
+            padding-left: 100px;
+            gap: 4px;
+        }
+
+        .step-number {
+            width: 40px;
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+            padding: 4px 0;
+            user-select: none;
+        }
+
+        .step-number:hover {
+            color: #6c5ce7;
+            background: rgba(108, 92, 231, 0.2);
+            transform: scale(1.1);
+        }
+
+        .step-number.measure-start {
+            color: #6c5ce7;
+        }
+
+        /* Controls section */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .preset-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preset-selector label {
+            font-weight: 600;
+            color: #6c5ce7;
+            font-size: 14px;
+        }
+
+        .preset-selector select {
+            background: rgba(30, 30, 50, 0.8);
+            color: #e0e0e0;
+            border: 2px solid #6c5ce7;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            min-width: 200px;
+            transition: all 0.2s;
+        }
+
+        .preset-selector select:hover {
+            border-color: #a29bfe;
+            background: rgba(30, 30, 50, 1);
+        }
+
+        .preset-selector select:focus {
+            border-color: #a29bfe;
+            box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+        }
+
+        /* Info panel */
+        .info {
+            background: rgba(30, 30, 50, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .info strong {
+            color: #6c5ce7;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .cell.current-step {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        /* Export Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #6c5ce7;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 2px solid rgba(108, 92, 231, 0.3);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #6c5ce7;
+            font-size: 1.5em;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #e0e0e0;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #6c5ce7;
+            transform: scale(1.2);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #6c5ce7;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(30, 30, 50, 0.6);
+            border: 2px solid rgba(108, 92, 231, 0.3);
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .loop-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .loop-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(30, 30, 50, 0.6);
+            border: 2px solid rgba(108, 92, 231, 0.3);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .loop-btn:hover {
+            border-color: #6c5ce7;
+            color: #e0e0e0;
+        }
+
+        .loop-btn.active {
+            background: #6c5ce7;
+            border-color: #6c5ce7;
+            color: white;
+        }
+
+        .duration-info {
+            display: block;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px 25px;
+            border-top: 2px solid rgba(108, 92, 231, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .track-label {
+                min-width: 70px;
+                width: 70px;
+                font-size: 11px;
+                padding-left: 5px;
+            }
+
+            .step-numbers {
+                padding-left: 70px;
+            }
+
+            .cell {
+                width: 35px;
+                height: 35px;
+                border-radius: 4px;
+            }
+
+            .step-number {
+                width: 35px;
+                font-size: 9px;
+                padding: 3px 0;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .controls-column {
+                flex: 0 0 130px;
+            }
+
+            .track-controls {
+                height: 35px;
+            }
+
+            .track-btn {
+                width: 22px;
+                height: 22px;
+                font-size: 10px;
+            }
+
+            .volume-slider {
+                min-width: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .track-label {
+                min-width: 50px;
+                width: 50px;
+                font-size: 10px;
+            }
+
+            .step-numbers {
+                padding-left: 50px;
+            }
+
+            .cell {
+                width: 30px;
+                height: 30px;
+            }
+
+            .step-number {
+                width: 30px;
+                font-size: 8px;
+                padding: 2px 0;
+            }
+
+            .transport {
+                padding: 10px;
+            }
+
+            .bpm-control {
+                min-width: 200px;
+            }
+
+            .controls-column {
+                flex: 0 0 110px;
+            }
+
+            .track-controls {
+                height: 30px;
+                padding: 0 4px;
+            }
+
+            .track-btn {
+                width: 18px;
+                height: 18px;
+                font-size: 9px;
+            }
+
+            .volume-slider {
+                min-width: 30px;
+            }
+
+            .grid-wrapper {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BeatMaker</h1>
+
+        <!-- Transport Controls -->
+        <div class="transport">
+            <div class="transport-buttons">
+                <button id="undoBtn" onclick="undo()" class="btn btn-secondary" disabled>Undo</button>
+                <button id="redoBtn" onclick="redo()" class="btn btn-secondary" disabled>Redo</button>
+                <button id="playBtn" class="btn">Play</button>
+            </div>
+            <div class="bpm-control">
+                <label for="bpmSlider">BPM:</label>
+                <input type="range" id="bpmSlider" min="60" max="180" value="90" step="1">
+                <div class="bpm-value" id="bpmValue">90</div>
+            </div>
+        </div>
+
+        <!-- Sequencer Grid -->
+        <div class="sequencer">
+            <div class="step-numbers" id="stepNumbers"></div>
+            <div class="grid-wrapper" id="gridWrapper"></div>
+            <div class="controls">
+                <div class="preset-selector">
+                    <label for="presetSelect">Load Preset:</label>
+                    <select id="presetSelect" onchange="if(this.value) loadPreset(this.value); this.value='';">
+                        <option value="">-- Choose a preset --</option>
+                        <option value="Basic Rock">Basic Rock</option>
+                        <option value="Hip-Hop">Hip-Hop</option>
+                        <option value="House">House</option>
+                        <option value="Drum & Bass">Drum & Bass</option>
+                        <option value="Jazz Swing">Jazz Swing</option>
+                        <option value="Disco">Disco</option>
+                        <option value="Trap">Trap</option>
+                        <option value="Reggae">Reggae</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="exportBeat()">Export Audio</button>
+                <button class="btn" onclick="clearPattern()">Clear All</button>
+                <button class="btn" onclick="randomPattern()">Randomize</button>
+            </div>
+        </div>
+
+        <div class="info">
+            <strong>Click cells to create beats!</strong> Each row is a different drum sound. Press Play to hear your creation.<br>
+            <small>Tip: Click step numbers (1-16) to jump playback to that position. Click grid cells to preview drum sounds!</small>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Export Beat</h2>
+                <button class="modal-close" onclick="closeExportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="exportFilename">Filename:</label>
+                    <input type="text" id="exportFilename" class="form-input" placeholder="MyBeat">
+                </div>
+                <div class="form-group">
+                    <label for="exportFormat">Audio Format:</label>
+                    <select id="exportFormat" class="form-select">
+                        <option value="wav">WAV - Uncompressed (Best Quality)</option>
+                        <option value="mp3">MP3 - Compressed (Small File)</option>
+                        <option value="ogg">OGG - Compressed (Good Quality)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Loop Count:</label>
+                    <div class="loop-controls">
+                        <button class="loop-btn" onclick="setLoopCount(1)">1x</button>
+                        <button class="loop-btn active" onclick="setLoopCount(2)">2x</button>
+                        <button class="loop-btn" onclick="setLoopCount(4)">4x</button>
+                        <button class="loop-btn" onclick="setLoopCount(8)">8x</button>
+                    </div>
+                    <small id="durationDisplay" class="duration-info">Duration: 0s</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeExportModal()">Cancel</button>
+                <button class="btn" onclick="confirmExport()">Export</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+
+    <!-- BeatMaker JavaScript Modules -->
+    <script src="js/config.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/drum-synthesizers.js"></script>
+    <script src="js/grid-ui.js"></script>
+    <script src="js/pattern-manager.js"></script>
+    <script src="js/audio-engine.js"></script>
+    <script src="js/transport-controls.js"></script>
+    <script src="js/presets.js"></script>
+    <script src="js/undo-redo.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/SaveLoadManager.js"></script>
+    <script src="js/save-load.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
