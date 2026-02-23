@@ -26,7 +26,7 @@ function setupControls() {
 
 function updateSliderBackground(slider, value, min, max) {
     const percentage = ((value - min) / (max - min)) * 100;
-    slider.style.background = `linear-gradient(to right, #6c5ce7 0%, #6c5ce7 ${percentage}%, #444 ${percentage}%, #444 100%)`;
+    slider.style.background = `linear-gradient(to right, #6c5ce7 0%, #6c5ce7 ${percentage}%, rgba(255,255,255,0.08) ${percentage}%, rgba(255,255,255,0.08) 100%)`;
 }
 
 function togglePlay() {
