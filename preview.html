@@ -7,15 +7,38 @@
     <link rel="icon" type="image/svg+xml" href="/assets/img/favicon.svg">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --track-0: #ff6b6b;
+            --track-1: #ffa94d;
+            --track-2: #69db7c;
+            --track-3: #38d9a9;
+            --track-4: #f06595;
+            --track-5: #cc5de8;
+            --track-6: #4dabf7;
+            --track-7: #ffd43b;
+            --accent: #6c5ce7;
+        }
+
+        /* Assign track colors per row */
+        .track-row:nth-child(1) { --tc: var(--track-0); --tc-r: 255; --tc-g: 107; --tc-b: 107; }
+        .track-row:nth-child(2) { --tc: var(--track-1); --tc-r: 255; --tc-g: 169; --tc-b: 77; }
+        .track-row:nth-child(3) { --tc: var(--track-2); --tc-r: 105; --tc-g: 219; --tc-b: 124; }
+        .track-row:nth-child(4) { --tc: var(--track-3); --tc-r: 56;  --tc-g: 217; --tc-b: 169; }
+        .track-row:nth-child(5) { --tc: var(--track-4); --tc-r: 240; --tc-g: 101; --tc-b: 149; }
+        .track-row:nth-child(6) { --tc: var(--track-5); --tc-r: 204; --tc-g: 93;  --tc-b: 232; }
+        .track-row:nth-child(7) { --tc: var(--track-6); --tc-r: 77;  --tc-g: 171; --tc-b: 247; }
+        .track-row:nth-child(8) { --tc: var(--track-7); --tc-r: 255; --tc-g: 212; --tc-b: 59; }
+
         body {
-            background: #12121f;
+            background: linear-gradient(160deg, #0d0d1a 0%, #141428 50%, #0f1a2e 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: #e0e0e0;
+            color: #e0e0ee;
             overflow: hidden;
             user-select: none;
         }
@@ -23,38 +46,60 @@
         .header {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
             margin-bottom: 16px;
         }
 
         .bpm-display {
-            font-size: 14px;
-            color: #aaa;
-            font-variant-numeric: tabular-nums;
+            font-family: 'Courier New', 'Lucida Console', monospace;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 5px;
+            padding: 4px 10px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
         }
         .bpm-display span {
-            color: #6c5ce7;
-            font-weight: 600;
+            color: #69db7c;
+            font-weight: bold;
             font-size: 18px;
+            text-shadow: 0 0 8px rgba(105, 219, 124, 0.4);
+            letter-spacing: 1px;
+        }
+        .bpm-display .bpm-label {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .play-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 2px solid #6c5ce7;
-            background: transparent;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.15s, transform 0.1s;
+            transition: all 0.15s ease;
             flex-shrink: 0;
         }
-        .play-btn:hover { background: rgba(108, 92, 231, 0.15); }
+        .play-btn:hover {
+            background: rgba(108, 92, 231, 0.15);
+            border-color: rgba(108, 92, 231, 0.3);
+        }
         .play-btn:active { transform: scale(0.95); }
-        .play-btn svg { width: 20px; height: 20px; fill: #6c5ce7; }
-        .play-btn.playing { background: rgba(108, 92, 231, 0.2); }
+        .play-btn svg { width: 18px; height: 18px; fill: var(--accent); }
+        .play-btn.playing {
+            background: rgba(0, 184, 148, 0.15);
+            border-color: rgba(0, 184, 148, 0.3);
+        }
+        .play-btn.playing svg { fill: #00b894; }
 
         .grid-container {
             display: flex;
@@ -71,12 +116,27 @@
         .track-label {
             width: 60px;
             font-size: 10px;
-            color: #888;
+            color: rgba(255, 255, 255, 0.5);
             text-align: right;
             padding-right: 8px;
             flex-shrink: 0;
             white-space: nowrap;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+        }
+
+        .track-label::after {
+            content: '';
+            display: block;
+            width: 2px;
+            height: 12px;
+            border-radius: 1px;
+            background: var(--tc);
+            flex-shrink: 0;
+            box-shadow: 0 0 4px rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.4);
         }
 
         .track-cells {
@@ -88,18 +148,24 @@
             width: 16px;
             height: 16px;
             border-radius: 3px;
-            background: #1e1e32;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             transition: background 0.08s;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
         }
         .cell.active {
-            background: #6c5ce7;
+            background: var(--tc);
+            border-color: var(--tc);
+            box-shadow: 0 0 6px rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.4);
         }
         .cell.current {
-            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.1);
         }
         .cell.active.current {
-            background: #a29bfe;
-            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.9);
+            filter: brightness(1.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 10px rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.6);
         }
 
         /* Beat group separators */
@@ -108,10 +174,10 @@
         }
 
         .loading {
-            color: #888;
+            color: rgba(255, 255, 255, 0.4);
             text-align: center;
             padding: 40px;
-            font-size: 16px;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -123,7 +189,7 @@
                 <svg id="playIcon" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
                 <svg id="stopIcon" viewBox="0 0 24 24" style="display:none"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>
             </button>
-            <div class="bpm-display"><span id="bpmVal">90</span> BPM</div>
+            <div class="bpm-display"><span id="bpmVal">90</span> <span class="bpm-label">BPM</span></div>
         </div>
         <div class="grid-container" id="grid"></div>
     </div>
