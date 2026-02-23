@@ -695,6 +695,209 @@
             }
         }
 
+        /* === Help Modal === */
+        .help-modal-content {
+            max-width: 620px;
+        }
+
+        .help-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .help-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .help-tab {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 7px 14px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+
+        .help-tab:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border-color: var(--border-hover);
+        }
+
+        .help-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .help-modal-body {
+            max-height: 55vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.1) transparent;
+        }
+
+        .help-modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .help-modal-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .help-modal-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .help-modal-body h3 {
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 700;
+            margin: 20px 0 8px;
+        }
+
+        .help-modal-body h3:first-child {
+            margin-top: 0;
+        }
+
+        .help-modal-body p {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .help-modal-body ol,
+        .help-modal-body ul {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.7;
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .help-modal-body li {
+            margin-bottom: 4px;
+        }
+
+        .help-modal-body strong {
+            color: var(--text);
+        }
+
+        .help-tip {
+            background: rgba(108, 92, 231, 0.08);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            padding: 12px 14px;
+            margin: 16px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        .help-tip strong {
+            color: var(--accent-light);
+        }
+
+        .help-drum-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-left: 3px solid;
+            border-radius: 0 8px 8px 0;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+        }
+
+        .help-drum-card strong {
+            display: block;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .help-drum-card p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .help-genre-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .help-genre-card h4 {
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0 0 2px;
+        }
+
+        .help-genre-meta {
+            color: var(--accent-light);
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .help-genre-card p {
+            margin: 0 0 6px;
+            font-size: 13px;
+        }
+
+        .help-genre-recipe {
+            font-size: 12px;
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            padding: 6px 10px;
+        }
+
+        .help-genre-recipe strong {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .help-shortcuts {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .help-shortcut-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .help-shortcut-row span {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        kbd {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: var(--text);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
         /* === Responsive === */
         @media (max-width: 768px) {
             body {
@@ -869,6 +1072,7 @@
                 <button class="btn" onclick="exportBeat()">Export Audio</button>
                 <button class="btn" onclick="clearPattern()">Clear All</button>
                 <button class="btn" onclick="randomPattern()">Randomize</button>
+                <button class="btn btn-secondary" onclick="openHelpModal()">? Help</button>
             </div>
         </div>
 
@@ -916,6 +1120,9 @@
         </div>
     </div>
 
+    <!-- Help Modal (content injected by help.js) -->
+    <div id="helpModal" class="modal"></div>
+
     <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
 
@@ -930,6 +1137,7 @@
     <script src="js/presets.js"></script>
     <script src="js/undo-redo.js"></script>
     <script src="js/export.js"></script>
+    <script src="js/help.js"></script>
     <script src="js/SaveLoadManager.js"></script>
     <script src="js/save-load.js"></script>
     <script src="js/main.js"></script>
