@@ -212,12 +212,23 @@
         var cellEls = []; // cellEls[track][step]
 
         // ── Message handling ──────────────────────────────────────
+        var reelStarted = false;
         window.addEventListener('message', function(e) {
             var msg = e.data;
             if (!msg) return;
 
             if (msg.type === 'LOAD_PREVIEW') {
                 loadData(msg.data);
+            }
+
+            // Shuffle (spec 101) asks a card to start itself. Only a surface
+            // that already holds the viewer's gesture sends this, which is what
+            // lets the AudioContext start at all. The flag keeps a repeat from
+            // toggling playback straight back off.
+            if (msg.type === 'REEL_MODE' && msg.mode === 'audio' && !reelStarted) {
+                reelStarted = true;
+                var pb = document.getElementById('playBtn');
+                if (pb) pb.click();
             }
         });
 
