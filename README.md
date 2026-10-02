@@ -2,6 +2,8 @@
 
 A 16-step drum sequencer with 8 synthesized drum sounds, built entirely with the Web Audio API.
 
+**Try it in your browser, no account needed:** [mytekdev.com/tools/beat-maker](https://mytekdev.com/tools/beat-maker). The page has a live demo and explains what students learn from it.
+
 ## Features
 
 - **8 Synthesized Drum Tracks**: Kick, Snare, Hi-Hat, Open Hat, Clap, Tom, Rim, Crash — all generated in real-time via Web Audio oscillators and noise buffers
